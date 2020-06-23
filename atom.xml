@@ -110,9 +110,9 @@
     
       <category term="java" scheme="http://blog.ally520.cn/tags/java/"/>
     
-      <category term="源码" scheme="http://blog.ally520.cn/tags/%E6%BA%90%E7%A0%81/"/>
-    
       <category term="ConcurrentHashMap" scheme="http://blog.ally520.cn/tags/ConcurrentHashMap/"/>
+    
+      <category term="源码" scheme="http://blog.ally520.cn/tags/%E6%BA%90%E7%A0%81/"/>
     
   </entry>
   
