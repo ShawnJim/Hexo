@@ -276,7 +276,10 @@
     <div class="article-entry" itemprop="articleBody">
       
           
-              <h1 id="初探k8s-阿里云安装k8s公网ip部署"><a href="#初探k8s-阿里云安装k8s公网ip部署" class="headerlink" title="初探k8s-阿里云安装k8s公网ip部署"></a>初探k8s-阿里云安装k8s公网ip部署</h1><p>背景： 一般情况下，”kubeadm”部署集群时指定”–apiserver-advertise-address=<public_ip>“参数，即可在其他机器上，通过公网ip join到本机器，然而，阿里云ecs里没配置公网ip，etcd会无法启动，导致初始化失败。</public_ip></p>
+              <p>背景： </p>
+<blockquote>
+<p>一般情况下，”kubeadm”部署集群时指定”–apiserver-advertise-address=<public_ip>“参数，即可在其他机器上，通过公网ip join到本机器，然而，阿里云ecs里没配置公网ip，etcd会无法启动，导致初始化失败。</public_ip></p>
+</blockquote>
 <p>环境：阿里云按量付费ECS ,专用网络，kubeadm版本1.18.3，kubectl版本1.18.3, kubelet版本1.18.3，ubuntu18.03</p>
           
       
