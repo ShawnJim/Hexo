@@ -1,0 +1,598 @@
+<!DOCTYPE html>
+<html>
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="utf-8">
+  <meta name="baidu-site-verification" content="zreDpF4ooE">
+  
+  
+  
+  
+  <title>初探k8s-安装CNI网络插件calico(二) | Shawn | 个人小站</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="概述容器网络是容器选择连接到其他容器、主机和外部网络的机制。容器的 runtime 提供了各种网络模式，每种模式都会产生不同的体验。例如，Docker 默认情况下可以为容器配置以下网络：  none： 将容器添加到一个容器专门的网络堆栈中，没有对外连接。  host： 将容器添加到主机的网络堆栈中，没有隔离。  default bridge： 默认网络模式。每个容器可以通过 IP 地址相互连接。">
+<meta name="keywords" content="linux,kubernetes,calico">
+<meta property="og:type" content="article">
+<meta property="og:title" content="初探k8s-安装CNI网络插件calico(二)">
+<meta property="og:url" content="http://blog.ally520.cn/2020/07/04/初探k8s-安装CNI网络插件calico-二/index.html">
+<meta property="og:site_name" content="Shawn | 个人小站">
+<meta property="og:description" content="概述容器网络是容器选择连接到其他容器、主机和外部网络的机制。容器的 runtime 提供了各种网络模式，每种模式都会产生不同的体验。例如，Docker 默认情况下可以为容器配置以下网络：  none： 将容器添加到一个容器专门的网络堆栈中，没有对外连接。  host： 将容器添加到主机的网络堆栈中，没有隔离。  default bridge： 默认网络模式。每个容器可以通过 IP 地址相互连接。">
+<meta property="og:locale" content="default">
+<meta property="og:updated_time" content="2020-07-04T03:34:36.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="初探k8s-安装CNI网络插件calico(二)">
+<meta name="twitter:description" content="概述容器网络是容器选择连接到其他容器、主机和外部网络的机制。容器的 runtime 提供了各种网络模式，每种模式都会产生不同的体验。例如，Docker 默认情况下可以为容器配置以下网络：  none： 将容器添加到一个容器专门的网络堆栈中，没有对外连接。  host： 将容器添加到主机的网络堆栈中，没有隔离。  default bridge： 默认网络模式。每个容器可以通过 IP 地址相互连接。">
+  
+    <link rel="alternative" href="/atom.xml" title="Shawn | 个人小站" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/img/avatar.png">
+  
+  
+  <link rel="stylesheet" href="/css/style.css">
+  <link rel="stylesheet" href="/font-awesome/css/font-awesome.min.css">
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+  
+  
+  <!-- 加载特效 -->
+    <script src="/js/pace.js"></script>
+    <link href="/css/pace/pace-theme-flash.css" rel="stylesheet">
+  <script>
+      var yiliaConfig = {
+          fancybox: false,
+          animate: false,
+          isHome: false,
+          isPost: true,
+          isArchive: false,
+          isTag: false,
+          isCategory: false,
+          open_in_new: false
+      }
+  </script>
+
+  
+  <!-- 加载valine -->
+  <script src="https://unpkg.com/valine@1.3.9/dist/Valine.min.js"></script>
+</head></html>
+<body>
+  <div id="container">
+    <div class="left-col">
+    <div class="overlay"></div>
+<div class="intrude-less">
+    <header id="header" class="inner">
+        
+<script src="https://7.url.cn/edu/jslib/comb/require-2.1.6,jquery-1.9.1.min.js"></script>
+
+        <a href="/" class="profilepic">
+            
+            <img src="/img/avatar.png" class="js-avatar" style="width: 100%;height: 100%;opacity: 1;">
+            
+        </a>
+        <hgroup>
+          <h1 class="header-author"><a href="/">Shawn Jim</a></h1>
+        </hgroup>
+        
+        <p class="header-subtitle">北方に魚がいます,その名は塩です。</p>
+        
+        
+            <form>
+                <input type="text" class="st-default-search-input search" id="local-search-input" placeholder="搜索一下" autocomplete="off">
+            </form>
+            <div id="local-search-result"></div>
+        
+        
+            <script type="text/javascript">
+                (function() {
+                    'use strict';
+                    function getMatchData(keyword, data) {
+                        var matchData = [];
+                        for(var i =0;i<data.length;i++){
+                            if(data[i].title.toLowerCase().indexOf(keyword)>=0) 
+                                matchData.push(data[i])
+                        }
+                        return matchData;
+                    }
+                    var $input = $('#local-search-input');
+                    var $resultContent = $('#local-search-result');
+                    $input.keyup(function(){
+                        $.ajax({
+                            url: '/search.json',
+                            dataType: "json",
+                            success: function( json ) {
+                                var str='<ul class=\"search-result-list\">';                
+                                var keyword = $input.val().trim().toLowerCase();
+                                $resultContent.innerHTML = "";
+                                if ($input.val().trim().length <= 0) {
+                                    $resultContent.empty();
+                                    $('#switch-area').show();
+                                    return;
+                                }
+                                var results = getMatchData(keyword, json);
+                                if(results.length === 0){
+                                    $resultContent.empty();
+                                    $('#switch-area').show();
+                                    return;
+                                } 
+                                for(var i =0; i<results.length; i++){
+                                    str += "<li><a href='"+ results[i].url +"' class='search-result-title'>"+ results[i].title +"</a></li>";
+                                }
+                                str += "</ul>";
+                                $resultContent.empty();
+                                $resultContent.append(str);
+                                $('#switch-area').hide();
+                            }
+                        });
+                    });
+                })();
+            </script>
+        
+        
+            <div id="switch-btn" class="switch-btn">
+                <div class="icon">
+                    <div class="icon-ctn">
+                        <div class="icon-wrap icon-house" data-idx="0">
+                            <div class="birdhouse"></div>
+                            <div class="birdhouse_holes"></div>
+                        </div>
+                        <div class="icon-wrap icon-ribbon hide" data-idx="1">
+                            <div class="ribbon"></div>
+                        </div>
+                        
+                        
+                    </div>
+                </div>
+                <div class="tips-box hide">
+                    <div class="tips-arrow"></div>
+                    <ul class="tips-inner">
+                        <li>菜单</li>
+                        <li>标签</li>
+                        
+                        
+                    </ul>
+                </div>
+            </div>
+        
+        <div id="switch-area" class="switch-area">
+            <div class="switch-wrap">
+                <section class="switch-part switch-part1">
+                    <nav class="header-menu">
+                        <ul>
+                        
+                            <li><a href="/">主页</a></li>
+                        
+                            <li><a href="/archives/">归档</a></li>
+                        
+                            <li><a href="/categories/SpringBoot">SpringBoot</a></li>
+                        
+                            <li><a href="/categories/concurrent">高并发编程</a></li>
+                        
+                            <li><a href="/categories/中间件-工具">中间件/工具</a></li>
+                        
+                            <li><a href="/categories/数据结构">数据结构</a></li>
+                        
+                            <li><a href="http://resume.ally520.cn/" rel="external nofollow noopener noreferrer" target="_blank">简历</a></li>
+                        
+                        </ul>
+                    </nav>
+                    <nav class="header-nav">
+                        <ul class="social">
+                            
+                                <a class="fl github" target="_blank" href="https://github.com/ShawnJim" title="github" rel="external nofollow noopener noreferrer">github</a>
+                            
+                                <a class="fl rss" target="_blank" href="/atom.xml" title="rss">rss</a>
+                            
+                        </ul>
+                    </nav>
+                </section>
+                
+                <section class="switch-part switch-part2">
+                    <div class="widget tagcloud" id="js-tagcloud">
+                        <a href="/tags/ConcurrentHashMap/" style="font-size: 10px;">ConcurrentHashMap</a> <a href="/tags/HashMap/" style="font-size: 10px;">HashMap</a> <a href="/tags/LinkedList/" style="font-size: 10px;">LinkedList</a> <a href="/tags/Spring/" style="font-size: 17.5px;">Spring</a> <a href="/tags/SpringDataJpa/" style="font-size: 10px;">SpringDataJpa</a> <a href="/tags/SpringMVC/" style="font-size: 10px;">SpringMVC</a> <a href="/tags/calico/" style="font-size: 10px;">calico</a> <a href="/tags/centos/" style="font-size: 10px;">centos</a> <a href="/tags/docker/" style="font-size: 10px;">docker</a> <a href="/tags/hexo/" style="font-size: 10px;">hexo</a> <a href="/tags/idea/" style="font-size: 10px;">idea</a> <a href="/tags/java/" style="font-size: 20px;">java</a> <a href="/tags/jdbcTemplate/" style="font-size: 10px;">jdbcTemplate</a> <a href="/tags/kubeadm/" style="font-size: 10px;">kubeadm</a> <a href="/tags/kubectl/" style="font-size: 10px;">kubectl</a> <a href="/tags/kubelet/" style="font-size: 10px;">kubelet</a> <a href="/tags/kubernetes/" style="font-size: 12.5px;">kubernetes</a> <a href="/tags/linux/" style="font-size: 15px;">linux</a> <a href="/tags/log/" style="font-size: 10px;">log</a> <a href="/tags/mybatis/" style="font-size: 10px;">mybatis</a> <a href="/tags/mysql/" style="font-size: 12.5px;">mysql</a> <a href="/tags/properties/" style="font-size: 10px;">properties</a> <a href="/tags/shell/" style="font-size: 10px;">shell</a> <a href="/tags/slf4j/" style="font-size: 10px;">slf4j</a> <a href="/tags/thymeleaf/" style="font-size: 10px;">thymeleaf</a> <a href="/tags/tomcat/" style="font-size: 10px;">tomcat</a> <a href="/tags/yaml/" style="font-size: 10px;">yaml</a> <a href="/tags/博客/" style="font-size: 10px;">博客</a> <a href="/tags/多线程/" style="font-size: 12.5px;">多线程</a> <a href="/tags/工具/" style="font-size: 10px;">工具</a> <a href="/tags/并发容器/" style="font-size: 10px;">并发容器</a> <a href="/tags/源码/" style="font-size: 12.5px;">源码</a>
+                    </div>
+                </section>
+                
+                
+                
+            </div>
+        </div>
+    </header>
+</div>
+
+    </div>
+    <div class="mid-col">
+      <nav id="mobile-nav">
+      <div class="overlay">
+          <div class="slider-trigger"></div>
+          <h1 class="header-author js-mobile-header hide"><a href="/" title="回到主页">Shawn Jim</a></h1>
+      </div>
+    <div class="intrude-less">
+        <header id="header" class="inner">
+            <a href="/" class="profilepic">
+                
+                    <img src="/img/avatar.png" class="js-avatar" style="width: 100%; height: 100%; opacity: 1;">
+                
+            </a>
+            <hgroup>
+              <h1 class="header-author"><a href="/" title="回到主页">Shawn Jim</a></h1>
+            </hgroup>
+            
+            <p class="header-subtitle">北方に魚がいます,その名は塩です。</p>
+            
+            <nav class="header-menu">
+                <ul>
+                
+                    <li><a href="/">主页</a></li>
+                
+                    <li><a href="/archives/">归档</a></li>
+                
+                    <li><a href="/categories/SpringBoot">SpringBoot</a></li>
+                
+                    <li><a href="/categories/concurrent">高并发编程</a></li>
+                
+                    <li><a href="/categories/中间件-工具">中间件/工具</a></li>
+                
+                    <li><a href="/categories/数据结构">数据结构</a></li>
+                
+                    <li><a href="http://resume.ally520.cn/" rel="external nofollow noopener noreferrer" target="_blank">简历</a></li>
+                
+                <div class="clearfix"></div>
+                </ul>
+            </nav>
+            <nav class="header-nav">
+                <div class="social">
+                    
+                        <a class="github" target="_blank" href="https://github.com/ShawnJim" title="github" rel="external nofollow noopener noreferrer">github</a>
+                    
+                        <a class="rss" target="_blank" href="/atom.xml" title="rss">rss</a>
+                    
+                </div>
+            </nav>
+        </header>
+    </div>
+</nav>
+      <div class="body-wrap"><article id="post-初探k8s-安装CNI网络插件calico-二" class="article article-type-post" itemscope itemprop="blogPost">
+  
+    <div class="article-meta">
+      <a href="/2020/07/04/初探k8s-安装CNI网络插件calico-二/" class="article-date">
+      <time datetime="2020-07-04T03:33:10.000Z" itemprop="datePublished">2020-07-04</time>
+</a>
+
+    </div>
+  
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      初探k8s-安装CNI网络插件calico(二)
+    </h1>
+  
+
+
+      </header>
+      
+      <div class="article-info article-info-post">
+        
+    <div class="article-category tagcloud">
+    <a class="article-category-link" href="/categories/k8s/">k8s</a>
+    </div>
+
+
+        
+    <div class="article-tag tagcloud">
+        <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/calico/">calico</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/kubernetes/">kubernetes</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/linux/">linux</a></li></ul>
+    </div>
+
+        <div class="clearfix"></div>
+      </div>
+      
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+          
+        <h2 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h2><p>容器网络是容器选择连接到其他容器、主机和外部网络的机制。容器的 runtime 提供了各种网络模式，每种模式都会产生不同的体验。例如，Docker 默认情况下可以为容器配置以下网络：</p>
+<ul>
+<li><p><strong>none：</strong> 将容器添加到一个容器专门的网络堆栈中，没有对外连接。</p>
+</li>
+<li><p><strong>host：</strong> 将容器添加到主机的网络堆栈中，没有隔离。</p>
+</li>
+<li><p><strong>default bridge：</strong> 默认网络模式。每个容器可以通过 IP 地址相互连接。</p>
+</li>
+<li><p><strong>自定义网桥：</strong> 用户定义的网桥，具有更多的灵活性、隔离性和其他便利功能。</p>
+<a id="more"></a>
+
+
+</li>
+</ul>
+<h2 id="什么是-CNI"><a href="#什么是-CNI" class="headerlink" title="什么是 CNI"></a>什么是 CNI</h2><p>CNI(Container Network Interface) 是一个标准的，通用的接口。在容器平台，Docker，Kubernetes，Mesos 容器网络解决方案 flannel，calico，weave。只要提供一个标准的接口，就能为同样满足该协议的所有容器平台提供网络功能，而 CNI 正是这样的一个标准接口协议。</p>
+<h2 id="Kubernetes-中的-CNI-插件"><a href="#Kubernetes-中的-CNI-插件" class="headerlink" title="Kubernetes 中的 CNI 插件"></a>Kubernetes 中的 CNI 插件</h2><p>CNI 的初衷是创建一个框架，用于在配置或销毁容器时动态配置适当的网络配置和资源。插件负责为接口配置和管理 IP 地址，并且通常提供与 IP 管理、每个容器的 IP 分配、以及多主机连接相关的功能。容器运行时会调用网络插件，从而在容器启动时分配 IP 地址并配置网络，并在删除容器时再次调用它以清理这些资源。</p>
+<p>运行时或协调器决定了容器应该加入哪个网络以及它需要调用哪个插件。然后，插件会将接口添加到容器网络命名空间中，作为一个 veth 对的一侧。接着，它会在主机上进行更改，包括将 veth 的其他部分连接到网桥。再之后，它会通过调用单独的 IPAM（IP地址管理）插件来分配 IP 地址并设置路由。</p>
+<p>在 Kubernetes 中，kubelet 可以在适当的时间调用它找到的插件，为通过 kubelet 启动的 pod进行自动的网络配置。</p>
+<p>Kubernetes 中可选的 CNI 插件如下：</p>
+<ul>
+<li><strong>Flannel</strong></li>
+<li><strong>Calico</strong></li>
+<li>Canal</li>
+<li>Weave</li>
+<li></li>
+</ul>
+<h2 id="什么是-Calico"><a href="#什么是-Calico" class="headerlink" title="什么是 Calico"></a>什么是 Calico</h2><p>Calico 为容器和虚拟机提供了安全的网络连接解决方案，并经过了大规模生产验证（在公有云和跨数千个集群节点中），可与 Kubernetes，OpenShift，Docker，Mesos，DC / OS 和 OpenStack 集成。</p>
+<p>Calico 还提供网络安全规则的动态实施。使用 Calico 的简单策略语言，您可以实现对容器，虚拟机工作负载和裸机主机端点之间通信的细粒度控制。</p>
+<h2 id="安装步骤（只主需在主节点安装）"><a href="#安装步骤（只主需在主节点安装）" class="headerlink" title="安装步骤（只主需在主节点安装）"></a>安装步骤（只主需在主节点安装）</h2><p>参考<a href="https://docs.projectcalico.org/getting-started/kubernetes/quickstart" rel="external nofollow noopener noreferrer" target="_blank">calico官网</a></p>
+<h3 id="下载calico配置文件"><a href="#下载calico配置文件" class="headerlink" title="下载calico配置文件"></a>下载calico配置文件</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">wget https://docs.projectcalico.org/manifests/calico.yaml</span><br></pre></td></tr></table></figure>
+
+<h3 id="安装"><a href="#安装" class="headerlink" title="安装"></a>安装</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line">kubectl apply -f calico.yaml</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"> 输出如下</span></span><br><span class="line">configmap/calico-config created</span><br><span class="line">customresourcedefinition.apiextensions.k8s.io/bgpconfigurations.crd.projectcalico.org created</span><br><span class="line">customresourcedefinition.apiextensions.k8s.io/bgppeers.crd.projectcalico.org created</span><br><span class="line">customresourcedefinition.apiextensions.k8s.io/blockaffinities.crd.projectcalico.org created</span><br><span class="line">customresourcedefinition.apiextensions.k8s.io/clusterinformations.crd.projectcalico.org created</span><br><span class="line">customresourcedefinition.apiextensions.k8s.io/felixconfigurations.crd.projectcalico.org created</span><br><span class="line">customresourcedefinition.apiextensions.k8s.io/globalnetworkpolicies.crd.projectcalico.org created</span><br><span class="line">customresourcedefinition.apiextensions.k8s.io/globalnetworksets.crd.projectcalico.org created</span><br><span class="line">customresourcedefinition.apiextensions.k8s.io/hostendpoints.crd.projectcalico.org created</span><br><span class="line">customresourcedefinition.apiextensions.k8s.io/ipamblocks.crd.projectcalico.org created</span><br><span class="line">customresourcedefinition.apiextensions.k8s.io/ipamconfigs.crd.projectcalico.org created</span><br><span class="line">customresourcedefinition.apiextensions.k8s.io/ipamhandles.crd.projectcalico.org created</span><br><span class="line">customresourcedefinition.apiextensions.k8s.io/ippools.crd.projectcalico.org created</span><br><span class="line">customresourcedefinition.apiextensions.k8s.io/kubecontrollersconfigurations.crd.projectcalico.org created</span><br><span class="line">customresourcedefinition.apiextensions.k8s.io/networkpolicies.crd.projectcalico.org created</span><br><span class="line">customresourcedefinition.apiextensions.k8s.io/networksets.crd.projectcalico.org created</span><br><span class="line">clusterrole.rbac.authorization.k8s.io/calico-kube-controllers created</span><br><span class="line">clusterrolebinding.rbac.authorization.k8s.io/calico-kube-controllers created</span><br><span class="line">clusterrole.rbac.authorization.k8s.io/calico-node created</span><br><span class="line">clusterrolebinding.rbac.authorization.k8s.io/calico-node created</span><br><span class="line">daemonset.apps/calico-node created</span><br><span class="line">serviceaccount/calico-node created</span><br><span class="line">deployment.apps/calico-kube-controllers created</span><br><span class="line">serviceaccount/calico-kube-controllers created</span><br></pre></td></tr></table></figure>
+
+<h3 id="验证安装"><a href="#验证安装" class="headerlink" title="验证安装"></a>验证安装</h3><ul>
+<li><p>查看 Calico 网络插件处于 <strong>Running</strong> 状态即表示安装成功</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line">watch kubectl get pods --all-namespaces</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"> 输出如下</span></span><br><span class="line">Every 2.0s: kubectl get pods --all-namespaces                                                                         kubernetes-master: Sun Jun 21 14:22:03 2020</span><br><span class="line"></span><br><span class="line">NAMESPACE     NAME                                        READY   STATUS    RESTARTS   AGE</span><br><span class="line">kube-system   calico-kube-controllers-58b656d69f-fzl6k    1/1     Running   1          45m</span><br><span class="line">kube-system   calico-node-5cb6l                           1/1     Running   0          45m</span><br><span class="line">kube-system   calico-node-cldfq                           1/1     Running   0          45m</span><br><span class="line">kube-system   calico-node-nkp65                           1/1     Running   0          45m</span><br><span class="line">kube-system   calico-node-zts55                           1/1     Running   0          45m</span><br><span class="line">kube-system   coredns-7ff77c879f-fn6rq                    1/1     Running   0          93m</span><br><span class="line">kube-system   coredns-7ff77c879f-xgvp8                    1/1     Running   0          93m</span><br><span class="line">kube-system   etcd-kubernetes-master                      1/1     Running   0          94m</span><br><span class="line">kube-system   kube-apiserver-kubernetes-master            1/1     Running   2          94m</span><br><span class="line">kube-system   kube-controller-manager-kubernetes-master   1/1     Running   0          94m</span><br><span class="line">kube-system   kube-proxy-7b2mq                            1/1     Running   0          93m</span><br><span class="line">kube-system   kube-proxy-7zqhm                            1/1     Running   0          76m</span><br><span class="line">kube-system   kube-proxy-gj4hs                            1/1     Running   0          68m</span><br><span class="line">kube-system   kube-proxy-lxtg7                            1/1     Running   0          68m</span><br><span class="line">kube-system   kube-scheduler-kubernetes-master            1/1     Running   0          94m</span><br></pre></td></tr></table></figure>
+
+
+
+</li>
+</ul>
+<ul>
+<li><p>查看节点状态处于 <strong>Ready</strong> 即表示安装成功</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">kubectl get nodes</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"> 输出如下</span></span><br><span class="line">NAME                STATUS   ROLES    AGE   VERSION</span><br><span class="line">kubernetes-master   Ready    master   33m   v1.17.3</span><br><span class="line">kubernetes-node1    Ready    &lt;none&gt;   17m   v1.17.3</span><br><span class="line">kubernetes-node2    Ready    &lt;none&gt;   16m   v1.17.3</span><br><span class="line">kubernetes-node3    Ready    &lt;none&gt;   16m   v1.17.3</span><br></pre></td></tr></table></figure>
+
+</li>
+</ul>
+
+      
+    </div>
+    
+  </div>
+  
+    
+    <div class="copyright">
+        <p><span>本文标题:</span><a href="/2020/07/04/初探k8s-安装CNI网络插件calico-二/">初探k8s-安装CNI网络插件calico(二)</a></p>
+        <p><span>文章作者:</span><a href="/" title="访问 Shawn Jim 的个人博客">Shawn Jim</a></p>
+        <p><span>发布时间:</span>2020年07月04日 - 11时33分</p>
+        <p><span>最后更新:</span>2020年07月04日 - 11时34分</p>
+        <p>
+            <span>原始链接:</span><a class="post-url" href="/2020/07/04/初探k8s-安装CNI网络插件calico-二/" title="初探k8s-安装CNI网络插件calico(二)">http://blog.ally520.cn/2020/07/04/初探k8s-安装CNI网络插件calico-二/</a>
+            <span class="copy-path" data-clipboard-text="原文: http://blog.ally520.cn/2020/07/04/初探k8s-安装CNI网络插件calico-二/　　作者: Shawn Jim" title></span>
+        </p>
+        <p>
+            <span>许可协议:</span><i class="fa fa-creative-commons"></i> <a rel="external nofollow noopener noreferrer" href="http://creativecommons.org/licenses/by-nc-sa/3.0/cn/" title="中国大陆 (CC BY-NC-SA 3.0 CN)" target="_blank">"署名-非商用-相同方式共享 3.0"</a> 转载请保留原文链接及作者。
+        </p>
+    </div>
+
+
+
+<nav id="article-nav">
+  
+    <a href="/2020/07/04/初探k8s-通过资源文件部署应用-三/" id="article-nav-newer" class="article-nav-link-wrap">
+      <strong class="article-nav-caption"><</strong>
+      <div class="article-nav-title">
+        
+          初探k8s-通过资源文件部署应用(三)
+        
+      </div>
+    </a>
+  
+  
+    <a href="/2020/06/20/初探k8s-阿里云安装k8s公网ip部署-一/" id="article-nav-older" class="article-nav-link-wrap">
+      <div class="article-nav-title">初探k8s-阿里云安装k8s公网ip部署(一)</div>
+      <strong class="article-nav-caption">></strong>
+    </a>
+  
+</nav>
+
+
+  
+</article>
+
+    <div id="toc" class="toc-article">
+    <strong class="toc-title">文章目录</strong>
+    <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#概述"><span class="toc-number">1.</span> <span class="toc-text">概述</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#什么是-CNI"><span class="toc-number">2.</span> <span class="toc-text">什么是 CNI</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Kubernetes-中的-CNI-插件"><span class="toc-number">3.</span> <span class="toc-text">Kubernetes 中的 CNI 插件</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#什么是-Calico"><span class="toc-number">4.</span> <span class="toc-text">什么是 Calico</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#安装步骤（只主需在主节点安装）"><span class="toc-number">5.</span> <span class="toc-text">安装步骤（只主需在主节点安装）</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#下载calico配置文件"><span class="toc-number">5.1.</span> <span class="toc-text">下载calico配置文件</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#安装"><span class="toc-number">5.2.</span> <span class="toc-text">安装</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#验证安装"><span class="toc-number">5.3.</span> <span class="toc-text">验证安装</span></a></li></ol></li></ol>
+</div>
+<style>
+    .left-col .switch-btn {
+        display: none;
+    }
+    .left-col .switch-area {
+        display: none;
+    }
+</style>
+<input type="button" id="tocButton" value="隐藏目录" title="点击按钮隐藏或者显示文章目录">
+
+<script src="https://7.url.cn/edu/jslib/comb/require-2.1.6,jquery-1.9.1.min.js"></script>
+
+<script>
+    var valueHide = "隐藏目录";
+    var valueShow = "显示目录";
+    if ($(".left-col").is(":hidden")) {
+        $("#tocButton").attr("value", valueShow);
+    }
+    $("#tocButton").click(function() {
+        if ($("#toc").is(":hidden")) {
+            $("#tocButton").attr("value", valueHide);
+            $("#toc").slideDown(320);
+            $(".switch-btn, .switch-area").fadeOut(300);
+        }
+        else {
+            $("#tocButton").attr("value", valueShow);
+            $("#toc").slideUp(350);
+            $(".switch-btn, .switch-area").fadeIn(500);
+        }
+    })
+    if ($(".toc").length < 1) {
+        $("#toc, #tocButton").hide();
+        $(".switch-btn, .switch-area").show();
+    }
+</script>
+
+
+
+
+
+
+    
+        <section id="comments">
+<link rel="stylesheet" href="/css/gitment.css">
+<script src="/js/gitment.browser.js"></script>
+<script>
+var gitment = new Gitment({
+  id: '初探k8s-安装CNI网络插件calico(二)', // 可选。默认为 location.href
+  owner: 'ShawnJim',
+  repo: 'hexo',
+  oauth: {
+    client_id: '106b3da663254316dc8b',
+    client_secret: '4a33008db4f4591500e32a5a1b5300269d1b4e12',
+  },
+})
+gitment.render('comments')
+</script>
+</section>
+    
+
+
+
+    <div class="scroll" id="post-nav-button">
+        
+            <a href="/2020/07/04/初探k8s-通过资源文件部署应用-三/" title="上一篇: 初探k8s-通过资源文件部署应用(三)">
+                <i class="fa fa-angle-left"></i>
+            </a>
+        
+        <a title="文章列表"><i class="fa fa-bars"></i><i class="fa fa-times"></i></a>
+        
+            <a href="/2020/06/20/初探k8s-阿里云安装k8s公网ip部署-一/" title="下一篇: 初探k8s-阿里云安装k8s公网ip部署(一)">
+                <i class="fa fa-angle-right"></i>
+            </a>
+        
+    </div>
+    <ul class="post-list"><li class="post-list-item"><a class="post-list-link" href="/2020/07/04/初探k8s-通过资源文件部署应用-三/">初探k8s-通过资源文件部署应用(三)</a></li><li class="post-list-item"><a class="post-list-link" href="/2020/07/04/初探k8s-安装CNI网络插件calico-二/">初探k8s-安装CNI网络插件calico(二)</a></li><li class="post-list-item"><a class="post-list-link" href="/2020/06/20/初探k8s-阿里云安装k8s公网ip部署-一/">初探k8s-阿里云安装k8s公网ip部署(一)</a></li><li class="post-list-item"><a class="post-list-link" href="/2020/04/06/深入理解ArrayList/">深入理解ArrayList</a></li><li class="post-list-item"><a class="post-list-link" href="/2020/04/06/深入理解LinkedList/">深入理解LinkedList</a></li><li class="post-list-item"><a class="post-list-link" href="/2020/04/05/深入理解ConcurrentHashMap/">深入理解ConcurrentHashMap</a></li><li class="post-list-item"><a class="post-list-link" href="/2020/04/05/深入理解HashMap/">深入理解HashMap</a></li><li class="post-list-item"><a class="post-list-link" href="/2019/11/24/多线程高并发编程-线程池框架/">多线程高并发编程 - 线程池框架(三)</a></li><li class="post-list-item"><a class="post-list-link" href="/2019/08/13/高并发编程学习-并发容器/">多线程高并发编程 - 并发容器(二)</a></li><li class="post-list-item"><a class="post-list-link" href="/2019/08/10/高并发编程学习-多线程基础复习/">多线程高并发编程 - 同步器(一)</a></li><li class="post-list-item"><a class="post-list-link" href="/2019/07/31/初识SpringBoot丨第九篇-自定义Starter/">初识SpringBoot丨第九篇：自定义Starter</a></li><li class="post-list-item"><a class="post-list-link" href="/2019/07/31/centos升级内核版本/">centos升级内核版本</a></li><li class="post-list-item"><a class="post-list-link" href="/2019/07/30/Docker的安装与使用/">Docker的安装与使用</a></li><li class="post-list-item"><a class="post-list-link" href="/2019/07/30/初识SpringBoot丨第八篇-SpringDataJpa整合/">初识SpringBoot丨第八篇：SpringDataJpa整合</a></li><li class="post-list-item"><a class="post-list-link" href="/2019/07/27/初识SpringBoot丨第七篇-Mybatis整合/">初识SpringBoot丨第七篇：Mybatis整合</a></li><li class="post-list-item"><a class="post-list-link" href="/2019/07/27/初识SpringBoot丨第六篇-使用jdbcTemplate访问数据库/">初识SpringBoot丨第六篇：使用jdbcTemplate访问数据库</a></li><li class="post-list-item"><a class="post-list-link" href="/2019/07/26/初识SpringBoot丨第五篇-Spring-MVC配置及原理-拦截器应用/">初识SpringBoot丨第五篇：Spring MVC配置及原理 & 拦截器应用</a></li><li class="post-list-item"><a class="post-list-link" href="/2019/07/26/初识SpringBoot丨第四篇-整合thymeleaf-国际化配置/"> 初识SpringBoot丨第四篇：整合thymeleaf & 国际化配置</a></li><li class="post-list-item"><a class="post-list-link" href="/2019/07/24/初识SpringBoot丨第三篇-日志相关整合/">初识SpringBoot丨第三篇：日志相关整合</a></li><li class="post-list-item"><a class="post-list-link" href="/2019/07/19/初识SpringBoot丨第二篇-配置文件详解/">初识SpringBoot丨第二篇：配置文件详解</a></li><li class="post-list-item"><a class="post-list-link" href="/2019/07/12/初识SpringBoot丨第一篇-创建一个SpringBoot工程/">初识SpringBoot丨第一篇：创建一个SpringBoot工程</a></li><li class="post-list-item"><a class="post-list-link" href="/2019/04/09/使用hexo搭建博客系统/">使用hexo + gitpages + cloudStudio搭建博客系统</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/06/07/hello-world/">Hello World</a></li></ul>
+    
+<script src="https://7.url.cn/edu/jslib/comb/require-2.1.6,jquery-1.9.1.min.js"></script>
+
+    <script>
+        $(".post-list").addClass("toc-article");
+        // $(".post-list-item a").attr("target","_blank");
+        $("#post-nav-button > a:nth-child(2)").click(function() {
+            $(".fa-bars, .fa-times").toggle();
+            $(".post-list").toggle(300);
+            if ($(".toc").length > 0) {
+                $("#toc, #tocButton").toggle(200, function() {
+                    if ($(".switch-area").is(":visible")) {
+                        $("#toc, .switch-btn, .switch-area").toggle();
+                        $("#tocButton").attr("value", valueHide);
+                        }
+                    })
+            }
+            else {
+                $(".switch-btn, .switch-area").fadeToggle(300);
+            }
+        })
+    </script>
+
+
+
+<!-- 
+    <script>
+        
+    </script>
+ -->
+</div>
+      <footer id="footer">
+    <div class="outer">
+        <div id="footer-info">
+            <div class="footer-left">
+                &copy; 2020 Shawn Jim
+            </div>
+            <div class="footer-right">
+                <a href="http://hexo.io/" target="_blank" rel="external nofollow noopener noreferrer">Hexo &nbsp;&nbsp;</a><a href="https://github.com/ShawnJim/" target="_blank" rel="external nofollow noopener noreferrer">Blog</a> by shawn
+            </div>
+        </div>
+        
+    </div>
+</footer>
+
+    </div>
+    
+<script src="https://7.url.cn/edu/jslib/comb/require-2.1.6,jquery-1.9.1.min.js"></script>
+
+<script src="/js/main.js"></script>
+
+    <script>
+        $(document).ready(function() {
+            var backgroundnum = 1;
+            var backgroundimg = "url(/background/bg-x.jpg)".replace(/x/gi, Math.ceil(Math.random() * backgroundnum));
+            $("#mobile-nav").css({"background-image": backgroundimg,"background-size": "cover","background-position": "center"});
+            $(".left-col").css({"background-image": backgroundimg,"background-size": "cover","background-position": "center"});
+        })
+    </script>
+
+
+<!-- Google Analytics -->
+<script type="text/javascript">
+(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+ga('create', 'UA-143265251-1', 'auto');
+ga('send', 'pageview');
+
+</script>
+<!-- End Google Analytics -->
+
+
+
+	<script>
+	var _hmt = _hmt || [];
+	(function() {
+	  var hm = document.createElement("script");
+	  hm.src = "//hm.baidu.com/hm.js?a39f9392244f41438d73209fea779f8d";
+	  var s = document.getElementsByTagName("script")[0]; 
+	  s.parentNode.insertBefore(hm, s);
+	})();
+	</script>
+
+
+
+<div class="scroll" id="scroll">
+    <a href="#"><i class="fa fa-arrow-up"></i></a>
+    <a href="#comments"><i class="fa fa-comments-o"></i></a>
+    <a href="#footer"><i class="fa fa-arrow-down"></i></a>
+</div>
+<script>
+    $(document).ready(function() {
+        if ($("#comments").length < 1) {
+            $("#scroll > a:nth-child(2)").hide();
+        };
+    })
+</script>
+
+<script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js">
+</script>
+
+  <script language="javascript">
+    $(function() {
+        $("a[title]").each(function() {
+            var a = $(this);
+            var title = a.attr('title');
+            if (title == undefined || title == "") return;
+            a.data('title', title).removeAttr('title').hover(
+            function() {
+                var offset = a.offset();
+                $("<div id=\"anchortitlecontainer\"></div>").appendTo($("body")).html(title).css({
+                    top: offset.top - a.outerHeight() - 15,
+                    left: offset.left + a.outerWidth()/2 + 1
+                }).fadeIn(function() {
+                    var pop = $(this);
+                    setTimeout(function() {
+                        pop.remove();
+                    }, pop.text().length * 800);
+                });
+            }, function() {
+                $("#anchortitlecontainer").remove();
+            });
+        });
+    });
+</script>
+
+
+  </div>
+</body>

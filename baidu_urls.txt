@@ -1,3 +1,3 @@
-http://blog.ally520.cn/2020/06/20/初探k8s-阿里云安装k8s公网ip部署/
-http://blog.ally520.cn/2020/04/06/深入理解ArrayList/
-http://blog.ally520.cn/2020/04/06/深入理解LinkedList/
+http://blog.ally520.cn/2020/07/04/初探k8s-通过资源文件部署应用-三/
+http://blog.ally520.cn/2020/07/04/初探k8s-安装CNI网络插件calico-二/
+http://blog.ally520.cn/2020/06/20/初探k8s-阿里云安装k8s公网ip部署-一/
