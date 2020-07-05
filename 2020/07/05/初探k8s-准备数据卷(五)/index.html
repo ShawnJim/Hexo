@@ -17,12 +17,12 @@
 <meta property="og:site_name" content="Shawn | 个人小站">
 <meta property="og:description" content="概述在 Docker 中就有数据卷的概念，当容器删除时，数据也一起会被删除，想要持久化使用数据，需要把主机上的目录挂载到 Docker 中去，在 K8S 中，数据卷是通过 Pod 实现持久化的，如果 Pod 删除，数据卷也会一起删除，k8s 的数据卷是 docker 数据卷的扩展，K8S 适配各种存储系统，包括本地存储 EmptyDir，HostPath， 网络存储（NFS，GlusterFS，P">
 <meta property="og:locale" content="default">
-<meta property="og:image" content="http://blog.ally520.cn/2020/07/05/初探k8s-准备数据卷(五)/FmrJpdtID8AMR342KmvslGIr9WV_@.webp">
-<meta property="og:updated_time" content="2020-07-05T07:55:58.037Z">
+<meta property="og:image" content="http://blog.ally520.cn/2020/07/05/初探k8s-准备数据卷(五)/aigz5-zrin4.png">
+<meta property="og:updated_time" content="2020-07-05T08:00:37.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="初探k8s-准备数据卷(五)">
 <meta name="twitter:description" content="概述在 Docker 中就有数据卷的概念，当容器删除时，数据也一起会被删除，想要持久化使用数据，需要把主机上的目录挂载到 Docker 中去，在 K8S 中，数据卷是通过 Pod 实现持久化的，如果 Pod 删除，数据卷也会一起删除，k8s 的数据卷是 docker 数据卷的扩展，K8S 适配各种存储系统，包括本地存储 EmptyDir，HostPath， 网络存储（NFS，GlusterFS，P">
-<meta name="twitter:image" content="http://blog.ally520.cn/2020/07/05/初探k8s-准备数据卷(五)/FmrJpdtID8AMR342KmvslGIr9WV_@.webp">
+<meta name="twitter:image" content="http://blog.ally520.cn/2020/07/05/初探k8s-准备数据卷(五)/aigz5-zrin4.png">
   
     <link rel="alternative" href="/atom.xml" title="Shawn | 个人小站" type="application/atom+xml">
   
@@ -190,7 +190,7 @@
                 
                 <section class="switch-part switch-part2">
                     <div class="widget tagcloud" id="js-tagcloud">
-                        <a href="/tags/ConcurrentHashMap/" style="font-size: 10px;">ConcurrentHashMap</a> <a href="/tags/HashMap/" style="font-size: 10px;">HashMap</a> <a href="/tags/LinkedList/" style="font-size: 10px;">LinkedList</a> <a href="/tags/Spring/" style="font-size: 18.33px;">Spring</a> <a href="/tags/SpringDataJpa/" style="font-size: 10px;">SpringDataJpa</a> <a href="/tags/SpringMVC/" style="font-size: 10px;">SpringMVC</a> <a href="/tags/calico/" style="font-size: 10px;">calico</a> <a href="/tags/centos/" style="font-size: 10px;">centos</a> <a href="/tags/docker/" style="font-size: 10px;">docker</a> <a href="/tags/hexo/" style="font-size: 10px;">hexo</a> <a href="/tags/idea/" style="font-size: 10px;">idea</a> <a href="/tags/java/" style="font-size: 20px;">java</a> <a href="/tags/jdbcTemplate/" style="font-size: 10px;">jdbcTemplate</a> <a href="/tags/kubeadm/" style="font-size: 10px;">kubeadm</a> <a href="/tags/kubectl/" style="font-size: 10px;">kubectl</a> <a href="/tags/kubelet/" style="font-size: 10px;">kubelet</a> <a href="/tags/kubernetes/" style="font-size: 15px;">kubernetes</a> <a href="/tags/linux/" style="font-size: 16.67px;">linux</a> <a href="/tags/log/" style="font-size: 10px;">log</a> <a href="/tags/mybatis/" style="font-size: 10px;">mybatis</a> <a href="/tags/mysql/" style="font-size: 13.33px;">mysql</a> <a href="/tags/nfs/" style="font-size: 10px;">nfs</a> <a href="/tags/nginx-ingress/" style="font-size: 10px;">nginx-ingress</a> <a href="/tags/properties/" style="font-size: 10px;">properties</a> <a href="/tags/shell/" style="font-size: 10px;">shell</a> <a href="/tags/slf4j/" style="font-size: 10px;">slf4j</a> <a href="/tags/thymeleaf/" style="font-size: 10px;">thymeleaf</a> <a href="/tags/tomcat/" style="font-size: 10px;">tomcat</a> <a href="/tags/yaml/" style="font-size: 11.67px;">yaml</a> <a href="/tags/博客/" style="font-size: 10px;">博客</a> <a href="/tags/多线程/" style="font-size: 13.33px;">多线程</a> <a href="/tags/工具/" style="font-size: 10px;">工具</a> <a href="/tags/并发容器/" style="font-size: 10px;">并发容器</a> <a href="/tags/源码/" style="font-size: 13.33px;">源码</a>
+                        <a href="/tags/ConcurrentHashMap/" style="font-size: 10px;">ConcurrentHashMap</a> <a href="/tags/HashMap/" style="font-size: 10px;">HashMap</a> <a href="/tags/LinkedList/" style="font-size: 10px;">LinkedList</a> <a href="/tags/Spring/" style="font-size: 18px;">Spring</a> <a href="/tags/SpringDataJpa/" style="font-size: 10px;">SpringDataJpa</a> <a href="/tags/SpringMVC/" style="font-size: 10px;">SpringMVC</a> <a href="/tags/calico/" style="font-size: 10px;">calico</a> <a href="/tags/centos/" style="font-size: 10px;">centos</a> <a href="/tags/configMap/" style="font-size: 10px;">configMap</a> <a href="/tags/dashboard/" style="font-size: 10px;">dashboard</a> <a href="/tags/docker/" style="font-size: 10px;">docker</a> <a href="/tags/hexo/" style="font-size: 10px;">hexo</a> <a href="/tags/idea/" style="font-size: 10px;">idea</a> <a href="/tags/java/" style="font-size: 20px;">java</a> <a href="/tags/jdbcTemplate/" style="font-size: 10px;">jdbcTemplate</a> <a href="/tags/kubeadm/" style="font-size: 10px;">kubeadm</a> <a href="/tags/kubectl/" style="font-size: 10px;">kubectl</a> <a href="/tags/kubelet/" style="font-size: 10px;">kubelet</a> <a href="/tags/kubernetes/" style="font-size: 16px;">kubernetes</a> <a href="/tags/linux/" style="font-size: 18px;">linux</a> <a href="/tags/log/" style="font-size: 10px;">log</a> <a href="/tags/mybatis/" style="font-size: 10px;">mybatis</a> <a href="/tags/mysql/" style="font-size: 14px;">mysql</a> <a href="/tags/nfs/" style="font-size: 12px;">nfs</a> <a href="/tags/nginx-ingress/" style="font-size: 10px;">nginx-ingress</a> <a href="/tags/properties/" style="font-size: 10px;">properties</a> <a href="/tags/shell/" style="font-size: 10px;">shell</a> <a href="/tags/slf4j/" style="font-size: 10px;">slf4j</a> <a href="/tags/thymeleaf/" style="font-size: 10px;">thymeleaf</a> <a href="/tags/tomcat/" style="font-size: 10px;">tomcat</a> <a href="/tags/yaml/" style="font-size: 12px;">yaml</a> <a href="/tags/博客/" style="font-size: 10px;">博客</a> <a href="/tags/多线程/" style="font-size: 14px;">多线程</a> <a href="/tags/工具/" style="font-size: 10px;">工具</a> <a href="/tags/并发容器/" style="font-size: 10px;">并发容器</a> <a href="/tags/源码/" style="font-size: 14px;">源码</a>
                     </div>
                 </section>
                 
@@ -303,7 +303,7 @@
 <p>我们以部署 MySQL8 为例，采用 <strong>NFS + PV/PVC</strong> 网络存储方案实现我们的 Kubernetes 数据持久化。</p>
 <h2 id="什么是-NFS"><a href="#什么是-NFS" class="headerlink" title="什么是 NFS"></a>什么是 NFS</h2><p>NFS 是 Network File System 的简写，即网络文件系统，NFS 是 FreeBSD 支持的文件系统中的一种。NFS 基于 RPC (Remote Procedure Call) 远程过程调用实现，其允许一个系统在网络上与它人共享目录和文件。通过使用 NFS，用户和程序就可以像访问本地文件一样访问远端系统上的文件。NFS 是一个非常稳定的，可移植的网络文件系统。具备可扩展和高性能等特性，达到了企业级应用质量标准。由于网络速度的增加和延迟的降低，NFS 系统一直是通过网络提供文件系统服务的有竞争力的选择 。</p>
 <h2 id="NFS-原理"><a href="#NFS-原理" class="headerlink" title="NFS 原理"></a>NFS 原理</h2><p>NFS 使用 RPC (Remote Procedure Call) 的机制进行实现，RPC 使得客户端可以调用服务端的函数。同时，由于有 VFS 的存在，客户端可以像使用其它普通文件系统一样使用 NFS 文件系统。经由操作系统的内核，将 NFS 文件系统的调用请求通过 TCP/IP 发送至服务端的 NFS 服务。NFS 服务器执行相关的操作，并将操作结果返回给客户端。</p>
-<img src="/2020/07/05/初探k8s-准备数据卷(五)/FmrJpdtID8AMR342KmvslGIr9WV_@.webp">)
+<img src="/2020/07/05/初探k8s-准备数据卷(五)/aigz5-zrin4.png">)
 
 <h2 id="NFS-服务主要进程"><a href="#NFS-服务主要进程" class="headerlink" title="NFS 服务主要进程"></a>NFS 服务主要进程</h2><ul>
 <li>rpc.nfsd：最主要的 NFS 进程，管理客户端是否可登录</li>
@@ -512,7 +512,7 @@
         <p><span>本文标题:</span><a href="/2020/07/05/初探k8s-准备数据卷(五)/">初探k8s-准备数据卷(五)</a></p>
         <p><span>文章作者:</span><a href="/" title="访问 Shawn Jim 的个人博客">Shawn Jim</a></p>
         <p><span>发布时间:</span>2020年07月05日 - 15时47分</p>
-        <p><span>最后更新:</span>2020年07月05日 - 15时55分</p>
+        <p><span>最后更新:</span>2020年07月05日 - 16时00分</p>
         <p>
             <span>原始链接:</span><a class="post-url" href="/2020/07/05/初探k8s-准备数据卷(五)/" title="初探k8s-准备数据卷(五)">http://blog.ally520.cn/2020/07/05/初探k8s-准备数据卷(五)/</a>
             <span class="copy-path" data-clipboard-text="原文: http://blog.ally520.cn/2020/07/05/初探k8s-准备数据卷(五)/　　作者: Shawn Jim" title></span>
@@ -525,6 +525,15 @@
 
 
 <nav id="article-nav">
+  
+    <a href="/2020/07/05/初探k8s-使用数据卷(六)/" id="article-nav-newer" class="article-nav-link-wrap">
+      <strong class="article-nav-caption"><</strong>
+      <div class="article-nav-title">
+        
+          初探k8s-使用数据卷(六)
+        
+      </div>
+    </a>
   
   
     <a href="/2020/07/05/初探k8s-安装nginx-ingress控制器(四)/" id="article-nav-older" class="article-nav-link-wrap">
@@ -606,7 +615,9 @@ gitment.render('comments')
 
     <div class="scroll" id="post-nav-button">
         
-            <a href="/" title="回到主页"><i class="fa fa-home"></i></a>
+            <a href="/2020/07/05/初探k8s-使用数据卷(六)/" title="上一篇: 初探k8s-使用数据卷(六)">
+                <i class="fa fa-angle-left"></i>
+            </a>
         
         <a title="文章列表"><i class="fa fa-bars"></i><i class="fa fa-times"></i></a>
         
@@ -615,7 +626,7 @@ gitment.render('comments')
             </a>
         
     </div>
-    <ul class="post-list"><li class="post-list-item"><a class="post-list-link" href="/2020/07/05/初探k8s-准备数据卷(五)/">初探k8s-准备数据卷(五)</a></li><li class="post-list-item"><a class="post-list-link" href="/2020/07/05/初探k8s-安装nginx-ingress控制器(四)/">初探k8s-安装nginx-ingress控制器(四)</a></li><li class="post-list-item"><a class="post-list-link" href="/2020/07/04/初探k8s-通过资源文件部署应用(三)/">初探k8s-通过资源文件部署应用(三)</a></li><li class="post-list-item"><a class="post-list-link" href="/2020/07/04/初探k8s-安装CNI网络插件calico(二)/">初探k8s-安装CNI网络插件calico(二)</a></li><li class="post-list-item"><a class="post-list-link" href="/2020/06/20/初探k8s-阿里云安装k8s公网ip部署(一)/">初探k8s-阿里云安装k8s公网ip部署(一)</a></li><li class="post-list-item"><a class="post-list-link" href="/2020/04/06/深入理解ArrayList/">深入理解ArrayList</a></li><li class="post-list-item"><a class="post-list-link" href="/2020/04/06/深入理解LinkedList/">深入理解LinkedList</a></li><li class="post-list-item"><a class="post-list-link" href="/2020/04/05/深入理解ConcurrentHashMap/">深入理解ConcurrentHashMap</a></li><li class="post-list-item"><a class="post-list-link" href="/2020/04/05/深入理解HashMap/">深入理解HashMap</a></li><li class="post-list-item"><a class="post-list-link" href="/2019/11/24/多线程高并发编程-线程池框架/">多线程高并发编程 - 线程池框架(三)</a></li><li class="post-list-item"><a class="post-list-link" href="/2019/08/13/高并发编程学习-并发容器/">多线程高并发编程 - 并发容器(二)</a></li><li class="post-list-item"><a class="post-list-link" href="/2019/08/10/高并发编程学习-多线程基础复习/">多线程高并发编程 - 同步器(一)</a></li><li class="post-list-item"><a class="post-list-link" href="/2019/07/31/初识SpringBoot丨第九篇:自定义Starter/">初识SpringBoot丨第九篇：自定义Starter</a></li><li class="post-list-item"><a class="post-list-link" href="/2019/07/31/centos升级内核版本/">centos升级内核版本</a></li><li class="post-list-item"><a class="post-list-link" href="/2019/07/30/Docker的安装与使用/">Docker的安装与使用</a></li><li class="post-list-item"><a class="post-list-link" href="/2019/07/30/初识SpringBoot丨第八篇:SpringDataJpa整合/">初识SpringBoot丨第八篇：SpringDataJpa整合</a></li><li class="post-list-item"><a class="post-list-link" href="/2019/07/27/初识SpringBoot丨第七篇:Mybatis整合/">初识SpringBoot丨第七篇：Mybatis整合</a></li><li class="post-list-item"><a class="post-list-link" href="/2019/07/27/初识SpringBoot丨第六篇:使用jdbcTemplate访问数据库/">初识SpringBoot丨第六篇：使用jdbcTemplate访问数据库</a></li><li class="post-list-item"><a class="post-list-link" href="/2019/07/26/初识SpringBoot丨第五篇:Spring-MVC配置及原理-拦截器应用/">初识SpringBoot丨第五篇：Spring MVC配置及原理 & 拦截器应用</a></li><li class="post-list-item"><a class="post-list-link" href="/2019/07/26/初识SpringBoot丨第四篇:整合thymeleaf-国际化配置/"> 初识SpringBoot丨第四篇：整合thymeleaf & 国际化配置</a></li><li class="post-list-item"><a class="post-list-link" href="/2019/07/24/初识SpringBoot丨第三篇:日志相关整合/">初识SpringBoot丨第三篇：日志相关整合</a></li><li class="post-list-item"><a class="post-list-link" href="/2019/07/19/初识SpringBoot丨第二篇:配置文件详解/">初识SpringBoot丨第二篇：配置文件详解</a></li><li class="post-list-item"><a class="post-list-link" href="/2019/07/12/初识SpringBoot丨第一篇:创建一个SpringBoot工程/">初识SpringBoot丨第一篇：创建一个SpringBoot工程</a></li><li class="post-list-item"><a class="post-list-link" href="/2019/04/09/使用hexo搭建博客系统/">使用hexo + gitpages + cloudStudio搭建博客系统</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/06/07/hello-world/">Hello World</a></li></ul>
+    <ul class="post-list"><li class="post-list-item"><a class="post-list-link" href="/2020/07/05/初探k8s-kubernetes-dashboard管理(八)/">初探k8s-kubernetes-dashboard管理(八)</a></li><li class="post-list-item"><a class="post-list-link" href="/2020/07/05/初探k8s-ConfigMap外部化配置(七)/">初探k8s-ConfigMap外部化配置(七)</a></li><li class="post-list-item"><a class="post-list-link" href="/2020/07/05/初探k8s-使用数据卷(六)/">初探k8s-使用数据卷(六)</a></li><li class="post-list-item"><a class="post-list-link" href="/2020/07/05/初探k8s-准备数据卷(五)/">初探k8s-准备数据卷(五)</a></li><li class="post-list-item"><a class="post-list-link" href="/2020/07/05/初探k8s-安装nginx-ingress控制器(四)/">初探k8s-安装nginx-ingress控制器(四)</a></li><li class="post-list-item"><a class="post-list-link" href="/2020/07/04/初探k8s-通过资源文件部署应用(三)/">初探k8s-通过资源文件部署应用(三)</a></li><li class="post-list-item"><a class="post-list-link" href="/2020/07/04/初探k8s-安装CNI网络插件calico(二)/">初探k8s-安装CNI网络插件calico(二)</a></li><li class="post-list-item"><a class="post-list-link" href="/2020/06/20/初探k8s-阿里云安装k8s公网ip部署(一)/">初探k8s-阿里云安装k8s公网ip部署(一)</a></li><li class="post-list-item"><a class="post-list-link" href="/2020/04/06/深入理解ArrayList/">深入理解ArrayList</a></li><li class="post-list-item"><a class="post-list-link" href="/2020/04/06/深入理解LinkedList/">深入理解LinkedList</a></li><li class="post-list-item"><a class="post-list-link" href="/2020/04/05/深入理解ConcurrentHashMap/">深入理解ConcurrentHashMap</a></li><li class="post-list-item"><a class="post-list-link" href="/2020/04/05/深入理解HashMap/">深入理解HashMap</a></li><li class="post-list-item"><a class="post-list-link" href="/2019/11/24/多线程高并发编程-线程池框架/">多线程高并发编程 - 线程池框架(三)</a></li><li class="post-list-item"><a class="post-list-link" href="/2019/08/13/高并发编程学习-并发容器/">多线程高并发编程 - 并发容器(二)</a></li><li class="post-list-item"><a class="post-list-link" href="/2019/08/10/高并发编程学习-多线程基础复习/">多线程高并发编程 - 同步器(一)</a></li><li class="post-list-item"><a class="post-list-link" href="/2019/07/31/初识SpringBoot丨第九篇:自定义Starter/">初识SpringBoot丨第九篇：自定义Starter</a></li><li class="post-list-item"><a class="post-list-link" href="/2019/07/31/centos升级内核版本/">centos升级内核版本</a></li><li class="post-list-item"><a class="post-list-link" href="/2019/07/30/Docker的安装与使用/">Docker的安装与使用</a></li><li class="post-list-item"><a class="post-list-link" href="/2019/07/30/初识SpringBoot丨第八篇:SpringDataJpa整合/">初识SpringBoot丨第八篇：SpringDataJpa整合</a></li><li class="post-list-item"><a class="post-list-link" href="/2019/07/27/初识SpringBoot丨第七篇:Mybatis整合/">初识SpringBoot丨第七篇：Mybatis整合</a></li><li class="post-list-item"><a class="post-list-link" href="/2019/07/27/初识SpringBoot丨第六篇:使用jdbcTemplate访问数据库/">初识SpringBoot丨第六篇：使用jdbcTemplate访问数据库</a></li><li class="post-list-item"><a class="post-list-link" href="/2019/07/26/初识SpringBoot丨第五篇:Spring-MVC配置及原理-拦截器应用/">初识SpringBoot丨第五篇：Spring MVC配置及原理 & 拦截器应用</a></li><li class="post-list-item"><a class="post-list-link" href="/2019/07/26/初识SpringBoot丨第四篇:整合thymeleaf-国际化配置/"> 初识SpringBoot丨第四篇：整合thymeleaf & 国际化配置</a></li><li class="post-list-item"><a class="post-list-link" href="/2019/07/24/初识SpringBoot丨第三篇:日志相关整合/">初识SpringBoot丨第三篇：日志相关整合</a></li><li class="post-list-item"><a class="post-list-link" href="/2019/07/19/初识SpringBoot丨第二篇:配置文件详解/">初识SpringBoot丨第二篇：配置文件详解</a></li><li class="post-list-item"><a class="post-list-link" href="/2019/07/12/初识SpringBoot丨第一篇:创建一个SpringBoot工程/">初识SpringBoot丨第一篇：创建一个SpringBoot工程</a></li><li class="post-list-item"><a class="post-list-link" href="/2019/04/09/使用hexo搭建博客系统/">使用hexo + gitpages + cloudStudio搭建博客系统</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/06/07/hello-world/">Hello World</a></li></ul>
     
 <script src="https://7.url.cn/edu/jslib/comb/require-2.1.6,jquery-1.9.1.min.js"></script>
 
