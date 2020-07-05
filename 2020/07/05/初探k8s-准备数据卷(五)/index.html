@@ -7,20 +7,22 @@
   
   
   
-  <title>初探k8s-安装CNI网络插件calico(二) | Shawn | 个人小站</title>
+  <title>初探k8s-准备数据卷(五) | Shawn | 个人小站</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  <meta name="description" content="概述容器网络是容器选择连接到其他容器、主机和外部网络的机制。容器的 runtime 提供了各种网络模式，每种模式都会产生不同的体验。例如，Docker 默认情况下可以为容器配置以下网络：  none： 将容器添加到一个容器专门的网络堆栈中，没有对外连接。  host： 将容器添加到主机的网络堆栈中，没有隔离。  default bridge： 默认网络模式。每个容器可以通过 IP 地址相互连接。">
-<meta name="keywords" content="linux,kubernetes,calico">
+  <meta name="description" content="概述在 Docker 中就有数据卷的概念，当容器删除时，数据也一起会被删除，想要持久化使用数据，需要把主机上的目录挂载到 Docker 中去，在 K8S 中，数据卷是通过 Pod 实现持久化的，如果 Pod 删除，数据卷也会一起删除，k8s 的数据卷是 docker 数据卷的扩展，K8S 适配各种存储系统，包括本地存储 EmptyDir，HostPath， 网络存储（NFS，GlusterFS，P">
+<meta name="keywords" content="linux,kubernetes,nfs">
 <meta property="og:type" content="article">
-<meta property="og:title" content="初探k8s-安装CNI网络插件calico(二)">
-<meta property="og:url" content="http://blog.ally520.cn/2020/07/04/初探k8s-安装CNI网络插件calico(二)/index.html">
+<meta property="og:title" content="初探k8s-准备数据卷(五)">
+<meta property="og:url" content="http://blog.ally520.cn/2020/07/05/初探k8s-准备数据卷(五)/index.html">
 <meta property="og:site_name" content="Shawn | 个人小站">
-<meta property="og:description" content="概述容器网络是容器选择连接到其他容器、主机和外部网络的机制。容器的 runtime 提供了各种网络模式，每种模式都会产生不同的体验。例如，Docker 默认情况下可以为容器配置以下网络：  none： 将容器添加到一个容器专门的网络堆栈中，没有对外连接。  host： 将容器添加到主机的网络堆栈中，没有隔离。  default bridge： 默认网络模式。每个容器可以通过 IP 地址相互连接。">
+<meta property="og:description" content="概述在 Docker 中就有数据卷的概念，当容器删除时，数据也一起会被删除，想要持久化使用数据，需要把主机上的目录挂载到 Docker 中去，在 K8S 中，数据卷是通过 Pod 实现持久化的，如果 Pod 删除，数据卷也会一起删除，k8s 的数据卷是 docker 数据卷的扩展，K8S 适配各种存储系统，包括本地存储 EmptyDir，HostPath， 网络存储（NFS，GlusterFS，P">
 <meta property="og:locale" content="default">
-<meta property="og:updated_time" content="2020-07-04T03:34:36.000Z">
+<meta property="og:image" content="http://blog.ally520.cn/2020/07/05/初探k8s-准备数据卷(五)/FmrJpdtID8AMR342KmvslGIr9WV_@.webp">
+<meta property="og:updated_time" content="2020-07-05T07:55:58.037Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="初探k8s-安装CNI网络插件calico(二)">
-<meta name="twitter:description" content="概述容器网络是容器选择连接到其他容器、主机和外部网络的机制。容器的 runtime 提供了各种网络模式，每种模式都会产生不同的体验。例如，Docker 默认情况下可以为容器配置以下网络：  none： 将容器添加到一个容器专门的网络堆栈中，没有对外连接。  host： 将容器添加到主机的网络堆栈中，没有隔离。  default bridge： 默认网络模式。每个容器可以通过 IP 地址相互连接。">
+<meta name="twitter:title" content="初探k8s-准备数据卷(五)">
+<meta name="twitter:description" content="概述在 Docker 中就有数据卷的概念，当容器删除时，数据也一起会被删除，想要持久化使用数据，需要把主机上的目录挂载到 Docker 中去，在 K8S 中，数据卷是通过 Pod 实现持久化的，如果 Pod 删除，数据卷也会一起删除，k8s 的数据卷是 docker 数据卷的扩展，K8S 适配各种存储系统，包括本地存储 EmptyDir，HostPath， 网络存储（NFS，GlusterFS，P">
+<meta name="twitter:image" content="http://blog.ally520.cn/2020/07/05/初探k8s-准备数据卷(五)/FmrJpdtID8AMR342KmvslGIr9WV_@.webp">
   
     <link rel="alternative" href="/atom.xml" title="Shawn | 个人小站" type="application/atom+xml">
   
@@ -253,11 +255,11 @@
         </header>
     </div>
 </nav>
-      <div class="body-wrap"><article id="post-初探k8s-安装CNI网络插件calico(二)" class="article article-type-post" itemscope itemprop="blogPost">
+      <div class="body-wrap"><article id="post-初探k8s-准备数据卷(五)" class="article article-type-post" itemscope itemprop="blogPost">
   
     <div class="article-meta">
-      <a href="/2020/07/04/初探k8s-安装CNI网络插件calico(二)/" class="article-date">
-      <time datetime="2020-07-04T03:33:10.000Z" itemprop="datePublished">2020-07-04</time>
+      <a href="/2020/07/05/初探k8s-准备数据卷(五)/" class="article-date">
+      <time datetime="2020-07-05T07:47:26.000Z" itemprop="datePublished">2020-07-05</time>
 </a>
 
     </div>
@@ -269,7 +271,7 @@
         
   
     <h1 class="article-title" itemprop="name">
-      初探k8s-安装CNI网络插件calico(二)
+      初探k8s-准备数据卷(五)
     </h1>
   
 
@@ -285,7 +287,7 @@
 
         
     <div class="article-tag tagcloud">
-        <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/calico/">calico</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/kubernetes/">kubernetes</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/linux/">linux</a></li></ul>
+        <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/kubernetes/">kubernetes</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/linux/">linux</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/nfs/">nfs</a></li></ul>
     </div>
 
         <div class="clearfix"></div>
@@ -295,54 +297,211 @@
     <div class="article-entry" itemprop="articleBody">
       
           
-        <h2 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h2><p>容器网络是容器选择连接到其他容器、主机和外部网络的机制。容器的 runtime 提供了各种网络模式，每种模式都会产生不同的体验。例如，Docker 默认情况下可以为容器配置以下网络：</p>
-<ul>
-<li><p><strong>none：</strong> 将容器添加到一个容器专门的网络堆栈中，没有对外连接。</p>
-</li>
-<li><p><strong>host：</strong> 将容器添加到主机的网络堆栈中，没有隔离。</p>
-</li>
-<li><p><strong>default bridge：</strong> 默认网络模式。每个容器可以通过 IP 地址相互连接。</p>
-</li>
-<li><p><strong>自定义网桥：</strong> 用户定义的网桥，具有更多的灵活性、隔离性和其他便利功能。</p>
+        <h2 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h2><p>在 Docker 中就有数据卷的概念，当容器删除时，数据也一起会被删除，想要持久化使用数据，需要把主机上的目录挂载到 Docker 中去，在 K8S 中，数据卷是通过 Pod 实现持久化的，如果 Pod 删除，数据卷也会一起删除，k8s 的数据卷是 docker 数据卷的扩展，K8S 适配各种存储系统，包括本地存储 EmptyDir，HostPath， 网络存储（NFS，GlusterFS，PV/PVC）等。</p>
 <a id="more"></a>
 
+<p>我们以部署 MySQL8 为例，采用 <strong>NFS + PV/PVC</strong> 网络存储方案实现我们的 Kubernetes 数据持久化。</p>
+<h2 id="什么是-NFS"><a href="#什么是-NFS" class="headerlink" title="什么是 NFS"></a>什么是 NFS</h2><p>NFS 是 Network File System 的简写，即网络文件系统，NFS 是 FreeBSD 支持的文件系统中的一种。NFS 基于 RPC (Remote Procedure Call) 远程过程调用实现，其允许一个系统在网络上与它人共享目录和文件。通过使用 NFS，用户和程序就可以像访问本地文件一样访问远端系统上的文件。NFS 是一个非常稳定的，可移植的网络文件系统。具备可扩展和高性能等特性，达到了企业级应用质量标准。由于网络速度的增加和延迟的降低，NFS 系统一直是通过网络提供文件系统服务的有竞争力的选择 。</p>
+<h2 id="NFS-原理"><a href="#NFS-原理" class="headerlink" title="NFS 原理"></a>NFS 原理</h2><p>NFS 使用 RPC (Remote Procedure Call) 的机制进行实现，RPC 使得客户端可以调用服务端的函数。同时，由于有 VFS 的存在，客户端可以像使用其它普通文件系统一样使用 NFS 文件系统。经由操作系统的内核，将 NFS 文件系统的调用请求通过 TCP/IP 发送至服务端的 NFS 服务。NFS 服务器执行相关的操作，并将操作结果返回给客户端。</p>
+<img src="/2020/07/05/初探k8s-准备数据卷(五)/FmrJpdtID8AMR342KmvslGIr9WV_@.webp">)
 
-</li>
+<h2 id="NFS-服务主要进程"><a href="#NFS-服务主要进程" class="headerlink" title="NFS 服务主要进程"></a>NFS 服务主要进程</h2><ul>
+<li>rpc.nfsd：最主要的 NFS 进程，管理客户端是否可登录</li>
+<li>rpc.mountd：挂载和卸载 NFS 文件系统，包括权限管理</li>
+<li>rpc.lockd：非必要，管理文件锁，避免同时写出错</li>
+<li>rpc.statd：非必要，检查文件一致性，可修复文件</li>
 </ul>
-<h2 id="什么是-CNI"><a href="#什么是-CNI" class="headerlink" title="什么是 CNI"></a>什么是 CNI</h2><p>CNI(Container Network Interface) 是一个标准的，通用的接口。在容器平台，Docker，Kubernetes，Mesos 容器网络解决方案 flannel，calico，weave。只要提供一个标准的接口，就能为同样满足该协议的所有容器平台提供网络功能，而 CNI 正是这样的一个标准接口协议。</p>
-<h2 id="Kubernetes-中的-CNI-插件"><a href="#Kubernetes-中的-CNI-插件" class="headerlink" title="Kubernetes 中的 CNI 插件"></a>Kubernetes 中的 CNI 插件</h2><p>CNI 的初衷是创建一个框架，用于在配置或销毁容器时动态配置适当的网络配置和资源。插件负责为接口配置和管理 IP 地址，并且通常提供与 IP 管理、每个容器的 IP 分配、以及多主机连接相关的功能。容器运行时会调用网络插件，从而在容器启动时分配 IP 地址并配置网络，并在删除容器时再次调用它以清理这些资源。</p>
-<p>运行时或协调器决定了容器应该加入哪个网络以及它需要调用哪个插件。然后，插件会将接口添加到容器网络命名空间中，作为一个 veth 对的一侧。接着，它会在主机上进行更改，包括将 veth 的其他部分连接到网桥。再之后，它会通过调用单独的 IPAM（IP地址管理）插件来分配 IP 地址并设置路由。</p>
-<p>在 Kubernetes 中，kubelet 可以在适当的时间调用它找到的插件，为通过 kubelet 启动的 pod进行自动的网络配置。</p>
-<p>Kubernetes 中可选的 CNI 插件如下：</p>
+<h2 id="NFS-的关键工具"><a href="#NFS-的关键工具" class="headerlink" title="NFS 的关键工具"></a>NFS 的关键工具</h2><ul>
+<li>主要配置文件：<code>/etc/exports</code></li>
+<li>NFS 文件系统维护命令：<code>/usr/bin/exportfs</code></li>
+<li>共享资源的日志文件：<code>/var/lib/nfs/*tab</code></li>
+<li>客户端查询共享资源命令：<code>/usr/sbin/showmount</code></li>
+<li>端口配置：<code>/etc/sysconfig/nfs</code></li>
+</ul>
+<h2 id="NFS-服务端配置"><a href="#NFS-服务端配置" class="headerlink" title="NFS 服务端配置"></a>NFS 服务端配置</h2><p>在 NFS 服务器端的主要配置文件为 <code>/etc/exports</code> 时，通过此配置文件可以设置共享文件目录。每条配置记录由 NFS 共享目录、NFS 客户端地址和参数这 3 部分组成，格式如下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">[NFS 共享目录] [NFS 客户端地址 1 (参数 1, 参数 2, 参数 3……)] [客户端地址 2 (参数 1, 参数 2, 参数 3……)]</span><br></pre></td></tr></table></figure>
+
 <ul>
-<li><strong>Flannel</strong></li>
-<li><strong>Calico</strong></li>
-<li>Canal</li>
-<li>Weave</li>
-<li></li>
+<li>NFS 共享目录：服务器上共享出去的文件目录</li>
+<li>NFS 客户端地址：允许其访问的 NFS 服务器的客户端地址，可以是客户端 IP 地址，也可以是一个网段 (192.168.141.0/24)</li>
+<li>访问参数：括号中逗号分隔项，主要是一些权限选项</li>
 </ul>
-<h2 id="什么是-Calico"><a href="#什么是-Calico" class="headerlink" title="什么是 Calico"></a>什么是 Calico</h2><p>Calico 为容器和虚拟机提供了安全的网络连接解决方案，并经过了大规模生产验证（在公有云和跨数千个集群节点中），可与 Kubernetes，OpenShift，Docker，Mesos，DC / OS 和 OpenStack 集成。</p>
-<p>Calico 还提供网络安全规则的动态实施。使用 Calico 的简单策略语言，您可以实现对容器，虚拟机工作负载和裸机主机端点之间通信的细粒度控制。</p>
-<h2 id="安装步骤（只主需在主节点安装）"><a href="#安装步骤（只主需在主节点安装）" class="headerlink" title="安装步骤（只主需在主节点安装）"></a>安装步骤（只主需在主节点安装）</h2><p>参考<a href="https://docs.projectcalico.org/getting-started/kubernetes/quickstart" rel="external nofollow noopener noreferrer" target="_blank">calico官网</a></p>
-<h3 id="下载calico配置文件"><a href="#下载calico配置文件" class="headerlink" title="下载calico配置文件"></a>下载calico配置文件</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">wget https://docs.projectcalico.org/manifests/calico.yaml</span><br></pre></td></tr></table></figure>
-
-<h3 id="安装"><a href="#安装" class="headerlink" title="安装"></a>安装</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line">kubectl apply -f calico.yaml</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"> 输出如下</span></span><br><span class="line">configmap/calico-config created</span><br><span class="line">customresourcedefinition.apiextensions.k8s.io/bgpconfigurations.crd.projectcalico.org created</span><br><span class="line">customresourcedefinition.apiextensions.k8s.io/bgppeers.crd.projectcalico.org created</span><br><span class="line">customresourcedefinition.apiextensions.k8s.io/blockaffinities.crd.projectcalico.org created</span><br><span class="line">customresourcedefinition.apiextensions.k8s.io/clusterinformations.crd.projectcalico.org created</span><br><span class="line">customresourcedefinition.apiextensions.k8s.io/felixconfigurations.crd.projectcalico.org created</span><br><span class="line">customresourcedefinition.apiextensions.k8s.io/globalnetworkpolicies.crd.projectcalico.org created</span><br><span class="line">customresourcedefinition.apiextensions.k8s.io/globalnetworksets.crd.projectcalico.org created</span><br><span class="line">customresourcedefinition.apiextensions.k8s.io/hostendpoints.crd.projectcalico.org created</span><br><span class="line">customresourcedefinition.apiextensions.k8s.io/ipamblocks.crd.projectcalico.org created</span><br><span class="line">customresourcedefinition.apiextensions.k8s.io/ipamconfigs.crd.projectcalico.org created</span><br><span class="line">customresourcedefinition.apiextensions.k8s.io/ipamhandles.crd.projectcalico.org created</span><br><span class="line">customresourcedefinition.apiextensions.k8s.io/ippools.crd.projectcalico.org created</span><br><span class="line">customresourcedefinition.apiextensions.k8s.io/kubecontrollersconfigurations.crd.projectcalico.org created</span><br><span class="line">customresourcedefinition.apiextensions.k8s.io/networkpolicies.crd.projectcalico.org created</span><br><span class="line">customresourcedefinition.apiextensions.k8s.io/networksets.crd.projectcalico.org created</span><br><span class="line">clusterrole.rbac.authorization.k8s.io/calico-kube-controllers created</span><br><span class="line">clusterrolebinding.rbac.authorization.k8s.io/calico-kube-controllers created</span><br><span class="line">clusterrole.rbac.authorization.k8s.io/calico-node created</span><br><span class="line">clusterrolebinding.rbac.authorization.k8s.io/calico-node created</span><br><span class="line">daemonset.apps/calico-node created</span><br><span class="line">serviceaccount/calico-node created</span><br><span class="line">deployment.apps/calico-kube-controllers created</span><br><span class="line">serviceaccount/calico-kube-controllers created</span><br></pre></td></tr></table></figure>
-
-<h3 id="验证安装"><a href="#验证安装" class="headerlink" title="验证安装"></a>验证安装</h3><ul>
-<li><p>查看 Calico 网络插件处于 <strong>Running</strong> 状态即表示安装成功</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line">watch kubectl get pods --all-namespaces</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"> 输出如下</span></span><br><span class="line">Every 2.0s: kubectl get pods --all-namespaces                                                                         kubernetes-master: Sun Jun 21 14:22:03 2020</span><br><span class="line"></span><br><span class="line">NAMESPACE     NAME                                        READY   STATUS    RESTARTS   AGE</span><br><span class="line">kube-system   calico-kube-controllers-58b656d69f-fzl6k    1/1     Running   1          45m</span><br><span class="line">kube-system   calico-node-5cb6l                           1/1     Running   0          45m</span><br><span class="line">kube-system   calico-node-cldfq                           1/1     Running   0          45m</span><br><span class="line">kube-system   calico-node-nkp65                           1/1     Running   0          45m</span><br><span class="line">kube-system   calico-node-zts55                           1/1     Running   0          45m</span><br><span class="line">kube-system   coredns-7ff77c879f-fn6rq                    1/1     Running   0          93m</span><br><span class="line">kube-system   coredns-7ff77c879f-xgvp8                    1/1     Running   0          93m</span><br><span class="line">kube-system   etcd-kubernetes-master                      1/1     Running   0          94m</span><br><span class="line">kube-system   kube-apiserver-kubernetes-master            1/1     Running   2          94m</span><br><span class="line">kube-system   kube-controller-manager-kubernetes-master   1/1     Running   0          94m</span><br><span class="line">kube-system   kube-proxy-7b2mq                            1/1     Running   0          93m</span><br><span class="line">kube-system   kube-proxy-7zqhm                            1/1     Running   0          76m</span><br><span class="line">kube-system   kube-proxy-gj4hs                            1/1     Running   0          68m</span><br><span class="line">kube-system   kube-proxy-lxtg7                            1/1     Running   0          68m</span><br><span class="line">kube-system   kube-scheduler-kubernetes-master            1/1     Running   0          94m</span><br></pre></td></tr></table></figure>
-
-
-
-</li>
+<h3 id="访问权限参数"><a href="#访问权限参数" class="headerlink" title="访问权限参数"></a>访问权限参数</h3><table>
+<thead>
+<tr>
+<th>序号</th>
+<th>选项</th>
+<th>描述</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>1</td>
+<td>ro</td>
+<td>客户端对于共享文件目录为只读权限。默认</td>
+</tr>
+<tr>
+<td>2</td>
+<td>rw</td>
+<td>客户端对于共享文件目录具有读写权限</td>
+</tr>
+</tbody></table>
+<h3 id="用户映射参数"><a href="#用户映射参数" class="headerlink" title="用户映射参数"></a>用户映射参数</h3><table>
+<thead>
+<tr>
+<th>序号</th>
+<th>选项</th>
+<th>描述</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>1</td>
+<td>root_squash</td>
+<td>使客户端使用 root 账户访冋时，服务器映射为服务器本地的匿名账号</td>
+</tr>
+<tr>
+<td>2</td>
+<td>no_root_squash</td>
+<td>客户端连接服务端时如果使用的是 root，那么也拥有对服务端分享的目录的 root 权限</td>
+</tr>
+<tr>
+<td>3</td>
+<td>all_squash</td>
+<td>将所有客户端用户请求映射到匿名用户或用户组（nfsnobody)</td>
+</tr>
+<tr>
+<td>4</td>
+<td>no_all_squash</td>
+<td>与上相反。默认</td>
+</tr>
+<tr>
+<td>5</td>
+<td>anonuid=xxx</td>
+<td>将远程访问的所有用户都映射为匿名用户，并指定该用户为本地用户(UID=xxx)</td>
+</tr>
+<tr>
+<td>6</td>
+<td>anongid=xxx</td>
+<td>将远程访问的所有用户组都映射为匿名用户组账户，并指定该匿名用户组账户为本地用户组账户(GUI=xxx)</td>
+</tr>
+</tbody></table>
+<h3 id="其它配置参数"><a href="#其它配置参数" class="headerlink" title="其它配置参数"></a>其它配置参数</h3><table>
+<thead>
+<tr>
+<th>序号</th>
+<th>选项</th>
+<th>描述</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>1</td>
+<td>sync</td>
+<td>同步写操作，数据写入存储设备后返回成功信息。默认</td>
+</tr>
+<tr>
+<td>2</td>
+<td>async</td>
+<td>异步写提作，数据在未完全写入存储设备前就返回成功信息，实际还在内存，</td>
+</tr>
+<tr>
+<td>3</td>
+<td>wdelay</td>
+<td>延迟写入选项，将多个写提请求合并后写入硬盘，减少 I/O 次数， NFS 非正常关闭数据可能丢失。默认</td>
+</tr>
+<tr>
+<td>4</td>
+<td>no_wdelay</td>
+<td>与上相反，不与 async 同时生效，如果 NFS 服务器主要收到小且不相关的请求，该选项实际会降低性能</td>
+</tr>
+<tr>
+<td>5</td>
+<td>subtree</td>
+<td>若输出目录是一个子目录，则 NFS 服务器将检查其父目录的权限。默认</td>
+</tr>
+<tr>
+<td>6</td>
+<td>no_subtree</td>
+<td>即使输出目录是一个子目录， NFS 服务器也不检查其父目录的权限，这样可以提高效率</td>
+</tr>
+<tr>
+<td>7</td>
+<td>secure</td>
+<td>限制客户端只能从小于 1024 的 TCP/IP 端口连接 NFS 服务器。默认</td>
+</tr>
+<tr>
+<td>8</td>
+<td>insecure</td>
+<td>允许客户端从大于 1024 的 TCP/IP 端口连接服务器</td>
+</tr>
+</tbody></table>
+<h2 id="安装NFS服务端"><a href="#安装NFS服务端" class="headerlink" title="安装NFS服务端"></a>安装NFS服务端</h2><ul>
+<li>创建一个目录作为共享文件目录</li>
 </ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">mkdir -p /usr/local/kubernetes/volumes</span><br></pre></td></tr></table></figure>
+
 <ul>
-<li><p>查看节点状态处于 <strong>Ready</strong> 即表示安装成功</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">kubectl get nodes</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"> 输出如下</span></span><br><span class="line">NAME                STATUS   ROLES    AGE   VERSION</span><br><span class="line">kubernetes-master   Ready    master   33m   v1.17.3</span><br><span class="line">kubernetes-node1    Ready    &lt;none&gt;   17m   v1.17.3</span><br><span class="line">kubernetes-node2    Ready    &lt;none&gt;   16m   v1.17.3</span><br><span class="line">kubernetes-node3    Ready    &lt;none&gt;   16m   v1.17.3</span><br></pre></td></tr></table></figure>
+<li>给目录增加读写权限</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">chmod a+rw /usr/local/kubernetes/volumes</span><br></pre></td></tr></table></figure>
 
+<ul>
+<li>安装 NFS 服务端</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">apt-get update</span><br><span class="line">apt-get install -y nfs-kernel-server</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li><p>配置 NFS 服务目录，打开文件</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">vi /etc/exports</span><br></pre></td></tr></table></figure>
+
+<p>，在尾部新增一行，内容如下</p>
+<ul>
+<li><strong>/usr/local/kubernetes/volumes：</strong> 作为服务目录向客户端开放</li>
+<li><strong>*：</strong>表示任何 IP 都可以访问</li>
+<li><strong>rw：</strong> 读写权限</li>
+<li><strong>sync：</strong> 同步权限</li>
+<li><strong>no_subtree_check：</strong> 表示如果输出目录是一个子目录，NFS 服务器不检查其父目录的权限</li>
+<li><strong>no_root_squash：</strong> 客户端连接服务端时如果使用的是 root，那么也拥有对服务端分享的目录的 root 权限</li>
+</ul>
 </li>
 </ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">/usr/local/kubernetes/volumes *(rw,sync,no_subtree_check,no_root_squash)</span><br></pre></td></tr></table></figure>
 
+<ul>
+<li>重启服务，使配置生效</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">/etc/init.d/nfs-kernel-server restart</span><br></pre></td></tr></table></figure>
+
+<h2 id="安装客户端"><a href="#安装客户端" class="headerlink" title="安装客户端"></a>安装客户端</h2><p>安装客户端的目的是验证是否可以上传文件到服务端，安装命令如下</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">apt-get update &amp;&amp; apt-get install -y nfs-common</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>创建 NFS 客户端挂载目录</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">mkdir -p /usr/local/kubernetes/volumes-mount</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>将 NFS 服务器的 <code>/usr/local/kubernetes/volumes</code> 目录挂载到 NFS 客户端的 <code>/usr/local/kubernetes/volumes-mount</code> 目录</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">mount xxx.xx.xx.xx:/usr/local/kubernetes/volumes /usr/local/kubernetes/volumes-mount</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>使用 <code>df -h</code> 命令查看挂载信息</li>
+</ul>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">df -h</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"> 有此输出表示挂载成功</span></span><br><span class="line">&#123;nfs服务端安装服务器ip&#125;:/usr/local/kubernetes/volumes  41153024 6337536  32911872  17% /usr/local/kubernetes/volumes-mount</span><br></pre></td></tr></table></figure>
+
+<h2 id="验证-NFS-服务"><a href="#验证-NFS-服务" class="headerlink" title="验证 NFS 服务"></a>验证 NFS 服务</h2><ul>
+<li><p>测试文件上传</p>
+<p>在客户端文件夹内创建一个文件</p>
+</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ip addr &gt; /usr/local/kubernetes/volumes-mount/test.txt</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>查看nfs服务器 <code>/usr/local/kubernetes/volumes</code> 目录下是否有 <code>test.txt</code> 文件，有则表示成功</li>
+</ul>
+<h2 id="取消-NFS-客户端挂载"><a href="#取消-NFS-客户端挂载" class="headerlink" title="取消 NFS 客户端挂载"></a>取消 NFS 客户端挂载</h2><blockquote>
+<p><strong>注意：</strong> 不要直接在挂载目录下执行，否则会报错</p>
+</blockquote>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">umount /usr/local/kubernetes/volumes-mount</span><br></pre></td></tr></table></figure>
       
     </div>
     
@@ -350,13 +509,13 @@
   
     
     <div class="copyright">
-        <p><span>本文标题:</span><a href="/2020/07/04/初探k8s-安装CNI网络插件calico(二)/">初探k8s-安装CNI网络插件calico(二)</a></p>
+        <p><span>本文标题:</span><a href="/2020/07/05/初探k8s-准备数据卷(五)/">初探k8s-准备数据卷(五)</a></p>
         <p><span>文章作者:</span><a href="/" title="访问 Shawn Jim 的个人博客">Shawn Jim</a></p>
-        <p><span>发布时间:</span>2020年07月04日 - 11时33分</p>
-        <p><span>最后更新:</span>2020年07月04日 - 11时34分</p>
+        <p><span>发布时间:</span>2020年07月05日 - 15时47分</p>
+        <p><span>最后更新:</span>2020年07月05日 - 15时55分</p>
         <p>
-            <span>原始链接:</span><a class="post-url" href="/2020/07/04/初探k8s-安装CNI网络插件calico(二)/" title="初探k8s-安装CNI网络插件calico(二)">http://blog.ally520.cn/2020/07/04/初探k8s-安装CNI网络插件calico(二)/</a>
-            <span class="copy-path" data-clipboard-text="原文: http://blog.ally520.cn/2020/07/04/初探k8s-安装CNI网络插件calico(二)/　　作者: Shawn Jim" title></span>
+            <span>原始链接:</span><a class="post-url" href="/2020/07/05/初探k8s-准备数据卷(五)/" title="初探k8s-准备数据卷(五)">http://blog.ally520.cn/2020/07/05/初探k8s-准备数据卷(五)/</a>
+            <span class="copy-path" data-clipboard-text="原文: http://blog.ally520.cn/2020/07/05/初探k8s-准备数据卷(五)/　　作者: Shawn Jim" title></span>
         </p>
         <p>
             <span>许可协议:</span><i class="fa fa-creative-commons"></i> <a rel="external nofollow noopener noreferrer" href="http://creativecommons.org/licenses/by-nc-sa/3.0/cn/" title="中国大陆 (CC BY-NC-SA 3.0 CN)" target="_blank">"署名-非商用-相同方式共享 3.0"</a> 转载请保留原文链接及作者。
@@ -367,18 +526,9 @@
 
 <nav id="article-nav">
   
-    <a href="/2020/07/04/初探k8s-通过资源文件部署应用(三)/" id="article-nav-newer" class="article-nav-link-wrap">
-      <strong class="article-nav-caption"><</strong>
-      <div class="article-nav-title">
-        
-          初探k8s-通过资源文件部署应用(三)
-        
-      </div>
-    </a>
   
-  
-    <a href="/2020/06/20/初探k8s-阿里云安装k8s公网ip部署(一)/" id="article-nav-older" class="article-nav-link-wrap">
-      <div class="article-nav-title">初探k8s-阿里云安装k8s公网ip部署(一)</div>
+    <a href="/2020/07/05/初探k8s-安装nginx-ingress控制器(四)/" id="article-nav-older" class="article-nav-link-wrap">
+      <div class="article-nav-title">初探k8s-安装nginx-ingress控制器(四)</div>
       <strong class="article-nav-caption">></strong>
     </a>
   
@@ -390,7 +540,7 @@
 
     <div id="toc" class="toc-article">
     <strong class="toc-title">文章目录</strong>
-    <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#概述"><span class="toc-number">1.</span> <span class="toc-text">概述</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#什么是-CNI"><span class="toc-number">2.</span> <span class="toc-text">什么是 CNI</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Kubernetes-中的-CNI-插件"><span class="toc-number">3.</span> <span class="toc-text">Kubernetes 中的 CNI 插件</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#什么是-Calico"><span class="toc-number">4.</span> <span class="toc-text">什么是 Calico</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#安装步骤（只主需在主节点安装）"><span class="toc-number">5.</span> <span class="toc-text">安装步骤（只主需在主节点安装）</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#下载calico配置文件"><span class="toc-number">5.1.</span> <span class="toc-text">下载calico配置文件</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#安装"><span class="toc-number">5.2.</span> <span class="toc-text">安装</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#验证安装"><span class="toc-number">5.3.</span> <span class="toc-text">验证安装</span></a></li></ol></li></ol>
+    <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#概述"><span class="toc-number">1.</span> <span class="toc-text">概述</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#什么是-NFS"><span class="toc-number">2.</span> <span class="toc-text">什么是 NFS</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#NFS-原理"><span class="toc-number">3.</span> <span class="toc-text">NFS 原理</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#NFS-服务主要进程"><span class="toc-number">4.</span> <span class="toc-text">NFS 服务主要进程</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#NFS-的关键工具"><span class="toc-number">5.</span> <span class="toc-text">NFS 的关键工具</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#NFS-服务端配置"><span class="toc-number">6.</span> <span class="toc-text">NFS 服务端配置</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#访问权限参数"><span class="toc-number">6.1.</span> <span class="toc-text">访问权限参数</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#用户映射参数"><span class="toc-number">6.2.</span> <span class="toc-text">用户映射参数</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#其它配置参数"><span class="toc-number">6.3.</span> <span class="toc-text">其它配置参数</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#安装NFS服务端"><span class="toc-number">7.</span> <span class="toc-text">安装NFS服务端</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#安装客户端"><span class="toc-number">8.</span> <span class="toc-text">安装客户端</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#验证-NFS-服务"><span class="toc-number">9.</span> <span class="toc-text">验证 NFS 服务</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#取消-NFS-客户端挂载"><span class="toc-number">10.</span> <span class="toc-text">取消 NFS 客户端挂载</span></a></li></ol>
 </div>
 <style>
     .left-col .switch-btn {
@@ -439,7 +589,7 @@
 <script src="/js/gitment.browser.js"></script>
 <script>
 var gitment = new Gitment({
-  id: '初探k8s-安装CNI网络插件calico(二)', // 可选。默认为 location.href
+  id: '初探k8s-准备数据卷(五)', // 可选。默认为 location.href
   owner: 'ShawnJim',
   repo: 'hexo',
   oauth: {
@@ -456,13 +606,11 @@ gitment.render('comments')
 
     <div class="scroll" id="post-nav-button">
         
-            <a href="/2020/07/04/初探k8s-通过资源文件部署应用(三)/" title="上一篇: 初探k8s-通过资源文件部署应用(三)">
-                <i class="fa fa-angle-left"></i>
-            </a>
+            <a href="/" title="回到主页"><i class="fa fa-home"></i></a>
         
         <a title="文章列表"><i class="fa fa-bars"></i><i class="fa fa-times"></i></a>
         
-            <a href="/2020/06/20/初探k8s-阿里云安装k8s公网ip部署(一)/" title="下一篇: 初探k8s-阿里云安装k8s公网ip部署(一)">
+            <a href="/2020/07/05/初探k8s-安装nginx-ingress控制器(四)/" title="下一篇: 初探k8s-安装nginx-ingress控制器(四)">
                 <i class="fa fa-angle-right"></i>
             </a>
         
