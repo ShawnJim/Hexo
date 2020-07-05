@@ -161,6 +161,8 @@
                         
                             <li><a href="/categories/SpringBoot">SpringBoot</a></li>
                         
+                            <li><a href="/categories/k8s">k8s</a></li>
+                        
                             <li><a href="/categories/concurrent">高并发编程</a></li>
                         
                             <li><a href="/categories/中间件-工具">中间件/工具</a></li>
@@ -224,6 +226,8 @@
                 
                     <li><a href="/categories/SpringBoot">SpringBoot</a></li>
                 
+                    <li><a href="/categories/k8s">k8s</a></li>
+                
                     <li><a href="/categories/concurrent">高并发编程</a></li>
                 
                     <li><a href="/categories/中间件-工具">中间件/工具</a></li>
@@ -276,9 +280,10 @@
     <div class="article-entry" itemprop="articleBody">
       
           
-              <h2 id="Ingress"><a href="#Ingress" class="headerlink" title="Ingress"></a>Ingress</h2><p><strong>FEATURE STATE:</strong> <code>Kubernetes v1.1 [beta]</code></p>
-<h2 id="部署-Deployment"><a href="#部署-Deployment" class="headerlink" title="部署 Deployment"></a>部署 Deployment</h2><p>Ingress 可以提供负载均衡、SSL 终结和基于名称的虚拟托管。</p>
-<h2 id="专用术语"><a href="#专用术语" class="headerlink" title="专用术语"></a>专用术语</h2><p>为了表达更加清晰，本指南定义了以下术语：</p>
+              <h2 id="Ingress-是什么？"><a href="#Ingress-是什么？" class="headerlink" title="Ingress 是什么？"></a>Ingress 是什么？</h2><p><a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.18/#ingress-v1beta1-networking-k8s-io" rel="external nofollow noopener noreferrer" target="_blank">Ingress</a> 公开了从集群外部到集群内 <a href="https://kubernetes.io/docs/concepts/services-networking/service/" rel="external nofollow noopener noreferrer" target="_blank">services</a> 的 HTTP 和 HTTPS 路由。 流量路由由 Ingress 资源上定义的规则控制。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"> internet</span><br><span class="line">     |</span><br><span class="line">[ Ingress ]</span><br><span class="line">--|-----|--</span><br><span class="line">[ Services ]</span><br></pre></td></tr></table></figure>
+
+<p>可以将 Ingress 配置为提供服务外部可访问的 URL、负载均衡流量、终止 SSL / TLS，以及提供基于名称的虚拟主机。<a href="https://kubernetes.io/docs/concepts/services-networking/ingress-controllers" rel="external nofollow noopener noreferrer" target="_blank">Ingress 控制器</a> 通常负责通过负载均衡器来实现 Ingress，尽管它也可以配置边缘路由器或其他前端来帮助处理流量。</p>
           
       
     </div>
